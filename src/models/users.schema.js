@@ -6,6 +6,10 @@ export const createUser = (data) => {
         email:data.email,
         password:data.password,
         phone:data.phone,
+        image: {
+        url: data.image?.url || null,
+        public_id: data.image?.public_id || null
+        },
         createdAt: new Date(),
         updatedAt: null
     }

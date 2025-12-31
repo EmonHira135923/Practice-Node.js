@@ -1,5 +1,6 @@
 import { getUserCollection } from "../config/db.js";
 import { createUser } from "../models/users.schema.js";
+import cloudinary from "../config/cloudinary.js";
 import bcrypt from "bcrypt";
 
 
@@ -8,11 +9,28 @@ export const CreateUserController = async(req,res) => {
         const userCollection = getUserCollection();
         const {name,email,password,phone} = req.body;
         const hasedpassword = await bcrypt.hash(password,10);
+        let imageData = {
+            url: null,
+            public_id: null
+        };
+
+        // ✅ if image exists
+        if (req.file) {
+        const imgResult = await cloudinary.uploader.upload(req.file.path, {
+            folder: "users"
+        });
+
+        imageData = {
+            url: imgResult.secure_url,
+            public_id: imgResult.public_id
+        };
+        }
         const userdata = createUser({
             name,
             email,
             password: hasedpassword,
             phone,
+            image: imageData
         });
         const query = await userCollection.insertOne(userdata);
         res.status(200).json({
@@ -46,7 +64,6 @@ export const GetUserControllerbyId = async(req,res) => {
     try{
     const userCollection = getUserCollection();
     const { email }= req.params;
-    console.log(email);
     const query = {email};
     console.log("q",query)
 
@@ -72,16 +89,30 @@ export const GetUserControllerbyId = async(req,res) => {
 
     }
 }
-
 export const UpdateUserControllerbyId = async (req, res) => {
     try {
         const userCollection = getUserCollection();
         const {email} = req.params;
         const {phone} = req.body;
         const query = {email};
+
+        let image = null;
+
+        if (req.file) {
+        const imgResult = await cloudinary.uploader.upload(req.file.path, {
+            folder: "users"
+        });
+
+        image = {
+            url: imgResult.secure_url,
+            public_id: imgResult.public_id
+        };
+        }
+
         const updatedata = {
             $set:{
                 phone,
+                image,
                 updatedAt: new Date()
             }
         }
@@ -103,8 +134,6 @@ export const UpdateUserControllerbyId = async (req, res) => {
         });
     }
 };
-
-
 export const DeleteUserController = async(req,res) => {
     try{
             const  userCollection = getUserCollection();
