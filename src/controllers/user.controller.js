@@ -96,9 +96,16 @@ export const UpdateUserControllerbyId = async (req, res) => {
         const {phone} = req.body;
         const query = {email};
 
+        const oldUser = await userCollection.findOne(query);
+
         let image = null;
 
         if (req.file) {
+
+            if (oldUser?.image?.public_id) {
+        await cloudinary.uploader.destroy(oldUser.image.public_id);
+      }
+
         const imgResult = await cloudinary.uploader.upload(req.file.path, {
             folder: "users"
         });
@@ -136,9 +143,18 @@ export const UpdateUserControllerbyId = async (req, res) => {
 };
 export const DeleteUserController = async(req,res) => {
     try{
-            const  userCollection = getUserCollection();
+    const  userCollection = getUserCollection();
     const {email} = req.params;
     const query = {email};
+
+    // ✅ STEP 1: আগে user খুঁজে বের করি
+    const user = await userCollection.findOne(query);
+
+    // ✅ STEP 2: যদি image থাকে → cloudinary থেকে delete
+    if (user?.image?.public_id) {
+        await cloudinary.uploader.destroy(user.image.public_id);
+    }
+
     const result = await userCollection.deleteOne(query);
     res.status(200).json({
         message:"User Deleted Succesfully",
