@@ -64,11 +64,64 @@ export const GetUserControllerbyId = async(req,res) => {
     res.status(200).send(result);
     }
     catch(err){
-       res.status(400).json({
-        message:"Email Not Found!!!",
+       res.status(500).json({
+        message:"Data Not Found!!!",
         success:false,
         err:err.message
        })
 
     }
+}
+
+export const UpdateUserControllerbyId = async (req, res) => {
+    try {
+        const userCollection = getUserCollection();
+        const {email} = req.params;
+        const {phone} = req.body;
+        const query = {email};
+        const updatedata = {
+            $set:{
+                phone,
+                updatedAt: new Date()
+            }
+        }
+
+        const option = {};
+
+        const result = await userCollection.updateOne(query,updatedata,option);
+
+        res.status(200).json({
+            message: "Updated successfully",
+            success: true,
+            result
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            message: "Update failed",
+            success: false
+        });
+    }
+};
+
+
+export const DeleteUserController = async(req,res) => {
+    try{
+            const  userCollection = getUserCollection();
+    const {email} = req.params;
+    const query = {email};
+    const result = await userCollection.deleteOne(query);
+    res.status(200).json({
+        message:"User Deleted Succesfully",
+        success:true,
+        result});
+    }
+    catch(err){
+        return res.status(400).json({
+            message: "Not deleted data",
+            success:false,
+            err:err.message
+        })
+    }
+
 }
