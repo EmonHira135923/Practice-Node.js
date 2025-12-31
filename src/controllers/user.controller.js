@@ -42,3 +42,33 @@ export const GetUserController = async(req,res) => {
         res.status(400).json(err)
     }
 }
+export const GetUserControllerbyId = async(req,res) => {
+    try{
+    const userCollection = getUserCollection();
+    const { email }= req.params;
+    console.log(email);
+    const query = {email};
+    console.log("q",query)
+
+    const result = await userCollection.findOne(query);
+
+    if(!result){
+        res.status(400).json({
+        message:"Email Not Found!!!",
+        success:false,
+        err:err.message
+       })
+
+    }
+
+    res.status(200).send(result);
+    }
+    catch(err){
+       res.status(400).json({
+        message:"Email Not Found!!!",
+        success:false,
+        err:err.message
+       })
+
+    }
+}
