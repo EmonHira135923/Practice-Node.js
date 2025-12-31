@@ -1,5 +1,5 @@
 import express from "express";
-import {CreateUser, GetUser, hellocontroller,helloemon} from "../controllers/hello.controller.js";
+import { hellocontroller,helloemon} from "../controllers/hello.controller.js";
 
 const router = express.Router();
 
@@ -8,7 +8,5 @@ const router = express.Router();
 // })
 router.get("/",hellocontroller);
 router.get("/emon",helloemon);
-router.post("/create-user",CreateUser);
-router.get("/get-user",GetUser);
 
 export default router;
