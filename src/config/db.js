@@ -14,19 +14,46 @@ const client = new MongoClient(uri, {
 
 let db;
 let userCollection;
+let otpCollection;
 
-export const connectDB = async() => {
-    try{
-        await client.connect();
-        db = client.db("User_Management_System");
-        userCollection = db.collection("users");
-        console.log("MongoDb Conneted succesfully");
-    }
-    catch(err){
-        console.error("Db not connected succesfully");
-        process.exit(1);
-    }
-}
+export const connectDB = async () => {
+  try {
+    await client.connect();
+
+    db = client.db("User_Management_System");
+    userCollection = db.collection("users");
+    otpCollection = db.collection("otp");
+
+    // ✅ OTP indexes create AFTER connection
+    await setupOtpCollection();
+
+    console.log("MongoDB connected successfully");
+  } catch (err) {
+    console.error("DB connection failed:", err);
+    process.exit(1);
+  }
+};
 
 export const getDB = () => db;
 export const getUserCollection = () => userCollection;
+export const getOtpCollection = () => otpCollection;
+
+/**
+ * OTP Index Setup (TTL)
+ */
+const setupOtpCollection = async () => {
+  try {
+    // TTL Index (auto delete after expiresAt)
+    await otpCollection.createIndex(
+      { expiresAt: 1 },
+      { expireAfterSeconds: 0 }
+    );
+
+    // Email index
+    await otpCollection.createIndex({ email: 1 });
+
+    console.log("OTP collection indexes created");
+  } catch (error) {
+    console.error("OTP index setup error:", error);
+  }
+};

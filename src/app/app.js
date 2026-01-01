@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import hello from "../routes/hello.routes.js";
 import users from "../routes/user.routes.js";
 import auth from "../routes/auth.routes.js";
+import otp from "../routes/otp.routes.js";
 
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use("/",hello);
 app.use("/api",users);
 app.use("/api",auth);
+app.use("/api",otp);
 
 
 export default app;
