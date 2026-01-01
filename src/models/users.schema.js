@@ -10,6 +10,7 @@ export const createUser = (data) => {
         url: data.image?.url || null,
         public_id: data.image?.public_id || null
         },
+        role: "user",
         createdAt: new Date(),
         updatedAt: null
     }

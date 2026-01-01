@@ -2,6 +2,7 @@ import { getUserCollection } from "../config/db.js";
 import { createUser } from "../models/users.schema.js";
 import cloudinary from "../config/cloudinary.js";
 import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
 
 
 export const CreateUserController = async(req,res) => {
@@ -30,7 +31,8 @@ export const CreateUserController = async(req,res) => {
             email,
             password: hasedpassword,
             phone,
-            image: imageData
+            image: imageData,
+            roll: "user"
         });
         const query = await userCollection.insertOne(userdata);
         res.status(200).json({
@@ -170,3 +172,52 @@ export const DeleteUserController = async(req,res) => {
     }
 
 }
+
+export const GetMyProfileController = async (req, res) => {
+    try {
+        const userCollection = getUserCollection();
+        const user = await userCollection.findOne({ _id: new ObjectId(req.user._id) });
+        console.log(user)
+        if(!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({ message: "Failed to fetch profile", err });
+    }
+};
+
+
+// Admin
+export const GetAllUsers = async (req, res) => {
+  try {
+    const userCollection = getUserCollection();
+    const users = await userCollection.find().toArray();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users", err });
+  }
+};
+
+export const DeleteUserByAdmin = async (req, res) => {
+  try {
+    const userCollection = getUserCollection();
+    const { email } = req.params;
+
+    // STEP 1: user খুঁজে বের করা
+    const user = await userCollection.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // STEP 2: যদি image থাকে → cloudinary থেকে delete
+    if (user?.image?.public_id) {
+      await cloudinary.uploader.destroy(user.image.public_id);
+    }
+
+    // STEP 3: ডাটাবেস থেকে user delete করা
+    const result = await userCollection.deleteOne({ email });
+
+    res.status(200).json({ message: "User deleted successfully", result });
+  } catch (err) {
+    res.status(500).json({ message: "Delete failed", err });
+  }
+};
+
