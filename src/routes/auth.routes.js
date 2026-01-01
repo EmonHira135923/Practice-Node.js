@@ -2,8 +2,9 @@
 import express from "express";
 import { LoginController } from "../controllers/auth.controller.js";
 import jwt from "jsonwebtoken";
-import { DeleteUserByAdmin, GetAllUsers, GetMyProfileController } from "../controllers/user.controller.js";
+import { DeleteUserByAdmin, GetAllUsers, GetMyProfileController, GetSingleUserbyAdmin, UpdateUserByAdmin } from "../controllers/user.controller.js";
 import { verifyAdmin, verifyToken } from "../middlewares/auth.middleware.js";
+import upload from "../middlewares/multar.middlewares.js";
 
 const router = express.Router();
 
@@ -40,6 +41,8 @@ router.get("/me", verifyToken, GetMyProfileController);
 // Auth Routes
 // Admin only
 router.get("/users", verifyToken, verifyAdmin, GetAllUsers);
+router.get("/users/:email",verifyToken,verifyAdmin,GetSingleUserbyAdmin);
+router.patch("/users/:email",verifyToken,verifyAdmin,upload.single("image"),UpdateUserByAdmin);
 router.delete("/users/:email", verifyToken, verifyAdmin, DeleteUserByAdmin);
 
 export default router;
