@@ -7,10 +7,6 @@ export const LoginController = async (req, res) => {
     try {
         const userCollection = getUserCollection();
         const { email, password } = req.body;
-        console.log("REQ BODY:", req.body);
-        
-        
-
         const user = await userCollection.findOne({ email });
         if (!user) return res.status(400).json({ message: "User not found" });
 
