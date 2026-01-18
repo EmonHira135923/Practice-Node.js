@@ -5,6 +5,7 @@ import hello from "../routes/hello.routes.js";
 import users from "../routes/user.routes.js";
 import auth from "../routes/auth.routes.js";
 import otp from "../routes/otp.routes.js";
+import payments from "../routes/payment.routes.js";
 
 
 const app = express();
@@ -21,6 +22,7 @@ app.use("/",hello);
 app.use("/api",users);
 app.use("/api",auth);
 app.use("/api",otp);
+app.use("/api",payments);
 
 
 export default app;

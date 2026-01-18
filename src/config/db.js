@@ -15,6 +15,7 @@ const client = new MongoClient(uri, {
 let db;
 let userCollection;
 let otpCollection;
+let paymentCollection;
 
 export const connectDB = async () => {
   try {
@@ -23,6 +24,7 @@ export const connectDB = async () => {
     db = client.db("User_Management_System");
     userCollection = db.collection("users");
     otpCollection = db.collection("otp");
+    paymentCollection = db.collection("payments");
 
     // ✅ OTP indexes create AFTER connection
     await setupOtpCollection();
@@ -37,6 +39,7 @@ export const connectDB = async () => {
 export const getDB = () => db;
 export const getUserCollection = () => userCollection;
 export const getOtpCollection = () => otpCollection;
+export const getPaymentCollection = () => paymentCollection;
 
 /**
  * OTP Index Setup (TTL)
